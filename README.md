@@ -1,0 +1,2 @@
+# B9IS121_2324_TMD2_NETWORKS_SYSTEMS_ADM
+this repository is for completing the class assignments for B9IS121 NETWORKS AND SYSTEMS ADMINISTRATION (B9IS121_2324_TMD2)
