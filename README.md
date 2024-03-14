@@ -62,3 +62,9 @@ Note: the instructions based on how it work on your Ubuntu PC
     64 bytes from 172.168.10.2: icmp_seq=1 ttl=64 time=0.083 ms
     64 bytes from 172.168.10.2: icmp_seq=2 ttl=64 time=0.126 ms
 8. Open web browser and reach http://172.168.10.2/index.html to access the apache web site on the   container.
+
+References:
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#playbook-syntax
+https://docs.ansible.com/ansible/2.9/modules/docker_network_module.html#parameter-ipam_config
+https://docs.ansible.com/ansible/2.9/modules/docker_network_module.html
+https://ankush-chavan.medium.com/configure-docker-containers-using-ansible-79fa460a62b4
