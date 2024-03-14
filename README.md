@@ -1,6 +1,9 @@
 # B9IS121_2324_TMD2_NETWORKS_SYSTEMS_ADM
 This repository is for completing the class assignments for B9IS121 NETWORKS AND SYSTEMS ADMINISTRATION (B9IS121_2324_TMD2)
 
+Task:
+Automated Container deployment and Administration
+
 How it works
 Note: the instructions based on how it work on your Ubuntu PC
 1. Clone the repository to your local PC using 'git clone'
