@@ -1,0 +1,72 @@
+- name: Deploy Apache Docker Container
+  hosts: localhost  
+  connection: local
+  become: true
+  tasks:
+    #Install Docker python package which is already not installed
+    - name: Install Docker Python package
+      apt:
+        name: python3-docker
+        state: present
+    # Creates docker network with /30 subnet mask
+    - name: Set up container to run on 172.168.10.0/30 subnet
+      docker_network:
+        name: 20024471_B9IS121-network
+        ipam_config:
+          - subnet: "172.168.10.0/30"
+        
+    # Pulls the latest docker image with Apache web server.
+    - name: Pull Apache Docker image
+      docker_image:
+        name: httpd
+        tag: latest
+        source: pull
+
+    # Defines the list of container configurations to add to the docker network
+    # In this case, second IP is automatically assign to the bridge network between 
+    # docker host computer and the containers. this is a limitation.
+    - name: Define list of container configurations
+      set_fact:
+        container_configs:
+          - name: 20024471_B9IS121-container-1
+            image: httpd:latest
+            # add website directory to htdocs on the container
+            volumes:
+              - "{{ playbook_dir }}/myweb:/usr/local/apache2/htdocs"
+            ports:
+              - "8080:80"
+            networks:
+              - name: 20024471_B9IS121-network
+                ipv4_address: 172.168.10.2
+            networks_cli_compatible: yes
+            container_default_behavior: compatibility
+            network_mode: default               
+    
+          # increase the subnet to enable more containers if required.
+          # uncomment following under -name to configure more containers.
+          #- name: 20024471_B9IS121-container-2
+          #  image: httpd:latest
+          #  volumes:
+          #    - "{{ playbook_dir }}/myweb:/usr/local/apache2/htdocs"
+          #  ports:
+          #    - "8081:80"
+          #  networks:
+          #    - name: 20024471_B9IS121-network
+          #      ipv4_address: 172.168.10.3
+          #  networks_cli_compatible: yes
+          #  container_default_behavior: compatibility
+          #  network_mode: default
+
+    # iterate the list of containers and create the containers
+    - name: deploy an Apache Docker container
+      docker_container:
+        name: "{{ item.name }}"
+        image: "{{ item.image }}"
+        volumes: "{{ item.volumes }}"
+        ports: "{{ item.ports }}"
+        networks: "{{ item.networks }}"
+        networks_cli_compatible: "{{ item.networks_cli_compatible }}"
+        container_default_behavior: "{{ item.container_default_behavior }}"
+        network_mode: "{{ item.network_mode }}"
+      loop: "{{ container_configs }}"
+
