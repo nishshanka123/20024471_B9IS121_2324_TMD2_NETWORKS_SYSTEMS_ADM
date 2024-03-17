@@ -104,7 +104,7 @@
           #  container_default_behavior: compatibility
           #  network_mode: default 
 
-    # iterate the list of containers and create the containers
+    # iterate the list of container configurations and create the containers
     - name: deploy an Apache Docker container
       docker_container:
         name: "{{ item.name }}"

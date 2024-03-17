@@ -21,7 +21,7 @@ How it works
 Note: the instructions based on how it work on your Ubuntu PC
 1. Clone the repository to your local PC using 'git clone'. this is the control PC for executing the ansible script.
 2. Update the main branch using 'git pull' command. 
-3. Prepare the host PCs deployment environment
+3. Prepare the Control PCs deployment environment
     a. install python 3 (sudo apt install python3)
     b. install python package manager pip (sudo apt install python3-pip)
     c. install ansible (pip3 install ansible), try sudo apt install ansible if this not work
