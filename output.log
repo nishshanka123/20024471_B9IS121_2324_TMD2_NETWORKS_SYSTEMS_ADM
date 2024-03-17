@@ -1,0 +1,59 @@
+# ansible-playbook -i inventory.ini docker_deploy.yml --ask-pass --ask-become-pass
+    SSH password: 
+    BECOME password[defaults to SSH password]: 
+
+    PLAY [Deploy Apache Docker Container] ****************************************************************************************************************
+
+    TASK [Gathering Facts] *******************************************************************************************************************************
+    ok: [host1]
+
+    TASK [Install Docker dependencies] *******************************************************************************************************************
+    ok: [host1] => (item=apt-transport-https)
+    ok: [host1] => (item=ca-certificates)
+    ok: [host1] => (item=curl)
+    ok: [host1] => (item=gnupg)
+    ok: [host1] => (item=lsb-release)
+
+    TASK [Add Docker's official GPG key] *****************************************************************************************************************
+    ok: [host1]
+
+    TASK [Add Docker repository] *************************************************************************************************************************
+    ok: [host1]
+
+    TASK [Update apt packages cache] *********************************************************************************************************************
+    changed: [host1]
+
+    TASK [Install Docker] ********************************************************************************************************************************
+    ok: [host1]
+
+    TASK [Start Docker service] **************************************************************************************************************************
+    ok: [host1]
+
+    TASK [Install Docker Python package] *****************************************************************************************************************
+    ok: [host1]
+
+    TASK [Set up container to run on 172.168.10.0/30 subnet] *********************************************************************************************
+    changed: [host1]
+
+    TASK [Pull Apache Docker image] **********************************************************************************************************************
+    ok: [host1]
+
+    TASK [Create destination directory if it doesn't exist] **********************************************************************************************
+    ok: [host1]
+
+    TASK [Copy files to Docker volume] *******************************************************************************************************************
+    changed: [host1]
+
+    TASK [Define list of container configurations] *******************************************************************************************************
+    ok: [host1]
+
+    TASK [deploy an Apache Docker container] *************************************************************************************************************
+    changed: [host1] => (item={'name': '20024471_B9IS121-container-1', 'image': 'httpd:latest', 'volumes': ['/tmp/nish-data/:/usr/local/apache2/htdocs/'], 'ports': ['8080:80'], 'networks': [{'name': '20024471_B9IS121-network', 'ipv4_address': '172.168.10.2'}], 'networks_cli_compatible': True, 'container_default_behavior': 'compatibility', 'network_mode': 'default'})
+
+    TASK [Print playbook directory] **********************************************************************************************************************
+    ok: [host1] => {
+        "playbook_dir": "/home/nishshanka/Documents/20024471_B9IS121_2324_TMD2_NETWORKS_SYSTEMS_ADM"
+    }
+
+    PLAY RECAP *******************************************************************************************************************************************
+    host1                      : ok=15   changed=4    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 

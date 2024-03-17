@@ -4,53 +4,45 @@ This repository is for completing the class assignments for B9IS121 NETWORKS AND
 Task:
 Automated Container deployment and Administration
 
+list of files:
+├── ansible.cfg                 # Ansible config file
+├── DockerConnectivity.jpg      # Docker Connectivity Diagram
+├── docker_deploy.yml           # Ansible script
+├── inventory.ini               # inventory file
+├── myweb                       # Web site
+│   ├── css
+│   │   └── main-css.css
+│   └── index.html
+├── output.log                  # console output for ansible script execution 
+└── README.md                   # GIT repo README file
+
+
 How it works
 Note: the instructions based on how it work on your Ubuntu PC
-1. Clone the repository to your local PC using 'git clone'
-2. Update the main using 'git pull' command. 
+1. Clone the repository to your local PC using 'git clone'. this is the control PC for executing the ansible script.
+2. Update the main branch using 'git pull' command. 
 3. Prepare the host PCs deployment environment
     a. install python 3 (sudo apt install python3)
     b. install python package manager pip (sudo apt install python3-pip)
     c. install ansible (pip3 install ansible), try sudo apt install ansible if this not work
-4. Execute the ansible script, following will be printed to the console.
-    # ansible-playbook docker_deploy.yml.yml 
-    PLAY [Deploy Apache Docker Container] **********************************************
-
-    TASK [Gathering Facts] **********************************************
-    ok: [localhost]
-
-    TASK [Install Docker Python package] **********************************************
-    ok: [localhost]
-
-    TASK [Set up container to run on 172.168.10.0/30 subnet ******************************************
-    ok: [localhost]
-
-    TASK [Pull Apache Docker image] **********************************************
-    ok: [localhost]
-
-    TASK [Define list of container configurations] **********************************************
-    ok: [localhost]
-
-    TASK [deploy an Apache Docker container] **********************************************
-    ok: [localhost] => (item={'name': '20024471_B9IS121-container-1', 'image': 'httpd:latest', 'volumes': ['/home/nishshanka/Documents/20024471_B9IS121_2324_TMD2_NETWORKS_SYSTEMS_ADM/myweb:/usr/local/apache2/htdocs'], 'ports': ['8080:80'], 'networks': [{'name': '20024471_B9IS121-network', 'ipv4_address': '172.168.10.2'}], 'networks_cli_compatible': True, 'container_default_behavior': 'compatibility', 'network_mode': 'default'})
-
-    PLAY RECAP **********************************************
-    localhost                  : ok=6    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
-5. Check the existance of the Docker containers using docker ps command
+    d. Launch an ubuntu virtual machine and get the IP address of it. 
+    e. Update inventory.ini file with Virtual Machine's IP address and the credentials for following   line
+        host1 ansible_host=<IP Address> ansible_user=<userName> ansible_password=<password> 
+4. Execute the ansible script with -i (to specify the inventory), --ask-pass(to enter the host Ubuntu VM password) and --ask-become-pass(to enable the docker execution rights), refer to the output.log file for the console output for the execution.
+    # ansible-playbook -i inventory.ini docker_deploy.yml --ask-pass --ask-become-pass
+5. Check the existance of the Docker containers using docker ps command. Logon to the virtual machine and open the terminal.
     # docker ps
     CONTAINER ID   IMAGE          COMMAND              CREATED          STATUS          PORTS                  NAMES
-    a3e08c9521df   httpd:latest   "httpd-foreground"   55 minutes ago   Up 19 minutes   0.0.0.0:8080->80/tcp   20024471_B9IS121-container-1
+    2ca13c3e2c6e   httpd:latest   "httpd-foreground"   19 minutes ago   Up 19 minutes   0.0.0.0:8080->80/tcp   20024471_B9IS121-container-1
+
 6. Also check the creation of docker network with 'docker network ls'
     # docker network ls
     NETWORK ID     NAME                       DRIVER    SCOPE
-    34750191842e   20024471_B9IS121-network   bridge    local
-    e162643cda63   bridge                     bridge    local
-    5863b7b50d0d   docker_gwbridge            bridge    local
-    71fe44244caa   host                       host      local
-    iiwqbusc80xe   ingress                    overlay   swarm
-    3d662baa4877   none                       null      local
-
-    here, docker_gwbridge network is created automatically and the second IP is assign to it.
+    b74025a88473   20024471_B9IS121-network   bridge    local
+    76529ccf4222   bridge                     bridge    local
+    f7dabdbe28b7   host                       host      local
+    ac38c1af758c   none                       null      local
+    
 7. Try to ping the bridge IP and the containers IP
     # ping 172.168.10.2
     PING 172.168.10.2 (172.168.10.2) 56(84) bytes of data.
@@ -61,10 +53,12 @@ Note: the instructions based on how it work on your Ubuntu PC
     PING 172.168.10.2 (172.168.10.2) 56(84) bytes of data.
     64 bytes from 172.168.10.2: icmp_seq=1 ttl=64 time=0.083 ms
     64 bytes from 172.168.10.2: icmp_seq=2 ttl=64 time=0.126 ms
-8. Open web browser and reach http://172.168.10.2/index.html to access the apache web site on the   container.
+
+8. Open web browser and enter URL http://<Virtual machine IP>:<8080>/myweb/ (e.g. http://192.168.122.192:8080/myweb/) or hhttp://<Virtual machine IP>:<8080>/myweb/index.html to access the web site on the container.
 
 References:
 https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_intro.html#playbook-syntax
 https://docs.ansible.com/ansible/2.9/modules/docker_network_module.html#parameter-ipam_config
 https://docs.ansible.com/ansible/2.9/modules/docker_network_module.html
 https://ankush-chavan.medium.com/configure-docker-containers-using-ansible-79fa460a62b4
+https://docs.ansible.com/ansible/latest/inventory_guide/intro_inventory.html

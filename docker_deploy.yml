@@ -1,8 +1,42 @@
 - name: Deploy Apache Docker Container
-  hosts: localhost  
-  connection: local
+  hosts: docker_hosts  
   become: true
   tasks:
+    - name: Install Docker dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+
+    - name: Add Docker's official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        state: present
+
+    - name: Update apt packages cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+
     #Install Docker python package which is already not installed
     - name: Install Docker Python package
       apt:
@@ -22,6 +56,18 @@
         tag: latest
         source: pull
 
+    # copy the website to the host volume for deployment
+    - name: Create destination directory if it doesn't exist
+      ansible.builtin.file:
+        path: /tmp/nish-data
+        state: directory
+
+    - name: Copy files to Docker volume
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/myweb"
+        dest: /tmp/nish-data
+
+
     # Defines the list of container configurations to add to the docker network
     # In this case, second IP is automatically assign to the bridge network between 
     # docker host computer and the containers. this is a limitation.
@@ -32,7 +78,7 @@
             image: httpd:latest
             # add website directory to htdocs on the container
             volumes:
-              - "{{ playbook_dir }}/myweb:/usr/local/apache2/htdocs"
+              - "/tmp/nish-data/:/usr/local/apache2/htdocs/"
             ports:
               - "8080:80"
             networks:
@@ -46,16 +92,17 @@
           # uncomment following under -name to configure more containers.
           #- name: 20024471_B9IS121-container-2
           #  image: httpd:latest
+          # add website directory to htdocs on the container
           #  volumes:
-          #    - "{{ playbook_dir }}/myweb:/usr/local/apache2/htdocs"
+          #    - "/tmp/nish-data/:/usr/local/apache2/htdocs/"
           #  ports:
-          #    - "8081:80"
+          #    - "8080:80"
           #  networks:
           #    - name: 20024471_B9IS121-network
-          #      ipv4_address: 172.168.10.3
+          #      ipv4_address: 172.168.10.2
           #  networks_cli_compatible: yes
           #  container_default_behavior: compatibility
-          #  network_mode: default
+          #  network_mode: default 
 
     # iterate the list of containers and create the containers
     - name: deploy an Apache Docker container
@@ -69,4 +116,10 @@
         container_default_behavior: "{{ item.container_default_behavior }}"
         network_mode: "{{ item.network_mode }}"
       loop: "{{ container_configs }}"
+
+    # print variable values for debug purposes 
+    - name: Print playbook directory
+      debug:
+        var: playbook_dir
+
 
